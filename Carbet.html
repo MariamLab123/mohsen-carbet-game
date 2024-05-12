@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohsen Carbet Game</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    canvas {
+        display: block;
+        background-color: #fff;
+        margin: 0 auto;
+    }
+    #h1{
+        font-family:sans-serif;
+        margin:10px;
+    }
+</style>
+</head>
+<body>
+    <center><h1 id="h1">Mohsen Carbet</h1></center>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Car properties
+        let carWidth = 50;
+        let carHeight = 100;
+        let carX = (canvas.width - carWidth) / 2;
+        let carY = canvas.height - carHeight - 20;
+        let carSpeed = 5;
+
+        // Obstacle properties
+        let obstacleWidth = 100;
+        let obstacleHeight = 20;
+        let obstacleX = Math.random() * (canvas.width - obstacleWidth);
+        let obstacleY = -obstacleHeight;
+        let obstacleSpeed = 2;
+        let score = 0;
+        let speedIncrement = 0.1; // Increase obstacle and car speed by this amount
+
+        // Event listeners
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowLeft") {
+                carX -= carSpeed;
+            }
+            if (event.key === "ArrowRight") {
+                carX += carSpeed;
+            }
+        });
+
+        function drawCar() {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(carX, carY, carWidth, carHeight);
+        }
+
+        function drawObstacle() {
+            ctx.fillStyle = "#f00";
+            ctx.fillRect(obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+        }
+
+        function drawScore() {
+            ctx.fillStyle = "#000";
+            ctx.font = "24px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+        }
+
+        function detectCollision() {
+            if (carX < obstacleX + obstacleWidth &&
+                carX + carWidth > obstacleX &&
+                carY < obstacleY + obstacleHeight &&
+                carY + carHeight > obstacleY) {
+                return true;
+            }
+            return false;
+        }
+
+        function update() {
+            // Update obstacle position
+            obstacleY += obstacleSpeed;
+            
+            // Increase car and obstacle speed
+            carSpeed += speedIncrement;
+            obstacleSpeed += speedIncrement;
+
+            // Reset obstacle position and increase score if obstacle reaches bottom
+            if (obstacleY > canvas.height) {
+                obstacleX = Math.random() * (canvas.width - obstacleWidth);
+                obstacleY = -obstacleHeight;
+                score++;
+            }
+
+            // Check for collision
+            if (detectCollision()) {
+                // Collision detected, reset score and position
+                score = 0;
+                obstacleX = Math.random() * (canvas.width - obstacleWidth);
+                obstacleY = -obstacleHeight;
+                // Reset speeds
+                carSpeed = 5;
+                obstacleSpeed = 2;
+            }
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the car and obstacle
+            drawCar();
+            drawObstacle();
+
+            // Draw score
+            drawScore();
+
+            requestAnimationFrame(update);
+        }
+
+        update();
+    });
+</script>
+</body>
+</html>
